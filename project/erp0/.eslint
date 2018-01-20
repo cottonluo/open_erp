@@ -1,0 +1,8 @@
+{"env":{"node":true,"es6":true£¬"browser": true,"commonjs": true,},
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+    "codeFrame": false
+  }
+}

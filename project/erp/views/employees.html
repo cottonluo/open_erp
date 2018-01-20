@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="/stylesheets/demo.css" />
+    </head>
+
+    <body>
+        <div id="app">
+
+            <fieldset>
+                <legend>
+                    	好意乐玩具有限公司-员工录入表
+                </legend>
+                <div class="form-group">
+                    <label>名字:</label>
+                    <input type="text" v-model="newPerson.name"/>
+                </div>
+                <div class="form-group">
+                    <label>省份:</label>
+                    <select v-model="newPerson.province">
+                    <option value="广东省">广东省</option>
+                    <option value="广西省">广西省</option>
+                    <option value="河北省">河北省</option>
+                    <option value="河南省">河南省</option>
+                    <option value="江苏省">江苏省</option>
+                    <option value="江西省">江西省</option>
+                    <option value="湖南省">湖南省</option>
+                    <option value="湖北省">湖北省</option>
+                    <option value="福建省">福建省</option>
+                    <option value="北京市">北京市</option>
+                    <option value="甘肃省">甘肃省</option>
+                    <option value="陕西省">陕西省</option>
+                    <option value="山西省">山西省</option>
+                    <option value="上海市">上海市</option>
+                    <option value="重庆市">重庆市</option>
+                    <option value="黑龙江省">黑龙江省</option>
+                    <option value="辽宁省">辽宁省</option>
+                    <option value="吉林省">吉林省</option>
+                    <option value="新疆省">新疆省</option>
+                    <option value="西藏省">西藏省</option>v
+                	</select>
+                </div>
+                <div class="form-group">
+                    <label>身份证号:</label>
+                    <input type="text" v-model="newPerson.id"/>
+                </div>
+                <div class="form-group">
+                    <label>联系电话(纯数字):</label>
+                    <input type="text" v-model="newPerson.contact"/>
+                </div>
+                <div class="form-group">
+                    <label>性别:</label>
+                    <select v-model="newPerson.sex">
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                	</select>
+                </div>
+                <div class="form-group">
+                    <label>部门:</label>
+                    <select v-model="newPerson.department">
+                    <option value="制衣部">制衣部</option>
+                    <option value="包装部">包装部</option>
+                    <option value="喷漆部">喷漆部</option>
+                    <option value="搪胶部">搪胶部</option>
+                    <option value="行政部">行政部</option>
+                    <option value="后勤部">后勤部</option>
+                    <option value="其他部门">临时部门</option>
+                	</select>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button @click="createPerson">创建员工到列表</button>
+                </div>
+        </fieldset>
+        <fieldset id="search">
+        	<legend>搜索员工</legend>
+        	    <div class="form-group">
+                    <label>身份证:</label>
+                    <input type="text" v-model="newPerson.id"/>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button @click="searchPerson(newPerson.id)">搜索员工</button>
+                </div>
+        </fieldset>
+        <fieldset id="showall">
+        	<legend>显示所有员工</legend>
+                <td :class="'text-center'">
+                	<button @click="showallPerson()">显示所有员工</button>
+                </td>
+        </fieldset>
+        <table>
+            <thead>
+                <tr>
+                	<!--<!--<th v-for="(name,index) in col_name">{{name.COLUMN_NAME}}</th>-->
+                	<th>工号</th>
+                    <th>名字</th>
+                    <th>年龄</th>
+                    <th>身份证号</th>
+                    <th>联系电话</th>
+                    <th>性别</th>
+                    <th>省份</th>
+                    <th>入职时间</th>
+                    <th>离职时间</th>
+                    <th>部门</th>
+                    <th>管理功能</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(person,index) in people">
+                	<td>{{ person.work_num}}</td>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.age }}</td>
+                    <td>{{ person.id }}</td>
+                    <td>{{ person.contact }}</td>
+                    <td>{{ person.sex }}</td>
+                    <td>{{ person.province }}</td>
+                    <td>{{ person.enter_date }}</td>
+                    <td>{{ person.leave_date }}</td>
+                    <td>{{ person.department }}</td>
+                    <td :class="'text-center'">
+                    	<button @click="deletePerson_from_page(index)">列表中去除</button>
+                    	<button @click="deletePerson_from_database(person.id)">数据库中去除</button>
+                    	<button @click="enter(person.id)">入职</button>
+                    	<button @click="leave(person.id)">离职</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </body>
+    <script src="/javascripts/vue.js"></script>
+    <script src="/javascripts/axios.js"></script>
+    <!--<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>-->
+    <!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+    <script>
+    	function get_date_in_format() {
+			var date = new Date(); 
+			var mon = date.getMonth() + 1;
+			var day = date.getDate();
+			var nowDay = date.getFullYear() + "-" + (mon<10?"0"+mon:mon) + "-" +(day<10?"0"+day:day);
+			console.log(nowDay.toString());
+    		return nowDay.toString();
+		} 
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                newPerson: {
+                    name:"",
+                    id:"",
+                    province:"",
+                    sex:"",
+               		enter_date:get_date_in_format(),
+               		department:"",
+               		contact:"",
+               		work_num:""
+                },
+                people: [],
+//              col_name:[]
+            },
+            methods:{
+                createPerson: function(){
+                	this.people=[];
+                	this.newPerson.work_num=this.newPerson.contact.substr(-4,4)+this.newPerson.id.substr(-8,4);
+                    this.people.push(this.newPerson);
+                    // 添加完newPerson对象后，重置newPerson对象
+//                  this.newPerson = {name:"", province: "",id:"", sex: "",enter_date:"",department:""}
+                },
+                deletePerson_from_page: function(index){
+                    // 删一个数组元素
+                    this.people.splice(index,1)
+                },
+                deletePerson_from_database: function(id){
+                	axios.get('http://localhost:3000/users/deleteUser',{params:{"id":id}})
+			  		.then( (response) =>{
+			  		this.people=response.data;
+			    	this.people=[]
+			  		})
+			  		.catch(function (error) {
+			    		alert("操作失败");
+			  		});
+                },
+                leave: function(id){
+                	axios.get('http://localhost:3000/users/leave',{params:{"id":id.toString(),"leave_date":get_date_in_format()}})
+			  		.then( (response) =>{
+			  			this.people=[];
+//			  		this.people=response.data;
+//			    	alert(response.status);
+			  		})
+			  		.catch(function (error) {
+			    		alert("操作失败");
+			  		});
+                },
+                enter: function(id){
+                	if(id.length==18){
+//              	axios.get('http://localhost:3000/users/addUser',{params:{"id":id.toString(),"enter_date":get_date_in_format()}})
+					console.log(this.newPerson)
+					axios.get('http://localhost:3000/users/addUser',{params:this.newPerson})
+			  		.then( (response) =>{
+			  		this.people=[];
+//			    	alert(response.status);
+			  		})
+			  		.catch(function (error) {
+			    		alert("操作失败");
+			  		});
+			  		}else{
+			  			alert("必须填写完整18位数字身份证号码");
+			  		}
+                },                
+                searchPerson: function(id){
+                	axios.get('http://localhost:3000/users/queryById',{params:{"id":id}})
+			  		.then( (response) =>{
+			  		this.people=response.data;
+//			    	console.log(response);
+			  		})
+			  		.catch(function (error) {
+			    		alert("操作失败");
+			  		});
+                },
+                showallPerson: function(){
+                	var r =confirm("确认执行操作？");
+                	if(r){
+                		axios.get('http://localhost:3000/users/queryAll')
+			  		.then( (response) =>{
+			  		this.people=response.data;
+			  		})
+			  		.catch(function (error) {
+			    		alert("操作失败");
+			  		});
+                	}
+                	else{
+                	}
+                }
+//              query_col_name: function(table_name){
+//              	axios.get('http://localhost:3000/query_col_name',{params:{"table_name":table_name}})
+//			  		.then( (response) =>{
+//			  		this.col_name=response.data;
+////			    	alert("操作成功");
+//			  		})
+//			  		.catch(function (error) {
+//			    		alert("操作失败");
+//			  		});
+//              },    
+            },
+//          mounted(){
+//          	this.query_col_name("employees")
+//          }
+        })
+    </script>
+
+</html>
